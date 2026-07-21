@@ -81,5 +81,20 @@ This project is open-source and available under the [GNU General Public License 
 
 ## Appendix
 * [Chinese Copywriting Guidelines](https://github.com/sparanoid/chinese-copywriting-guidelines)
+* **Open Data Attribution / 開放資料來源標示**：Zhuyin Mapping Database (`public/dict.json` & `src/engine/DEFAULT_DICT`)
+  <details>
+  <summary>Click to view license details / 點擊展開詳細聲明</summary>
+  <br>
 
+  * **Source**: [Chinese National Standard (CNS11643)](http://www.cns11643.gov.tw/)
+  * **License**: [Open Government Data License v1.0](https://data.gov.tw/license)
+  * **Conversion**: Extracted to `.cin` by Zhao Weilun (bluebat) in 2007.
+  * **Attribution**: Intellectual property belongs to the original government agency. Distributed under the Open Government Data License.
 
+  *(繁體中文版)*
+  * **資料來源**：[中華民國國家標準中文交換碼 (CNS11643)](http://www.cns11643.gov.tw/)
+  * **授權條款**：[政府開放資料授權條款 - 第 1.0 版](https://data.gov.tw/license)
+  * **格式轉換**：由趙惟倫 (bluebat) 於 2007 年整理並轉換為 `.cin` 格式。
+  * **版權聲明**：原始資料之智慧財產權歸屬原提供機關，本專案依開放資料條款進行重製與散布。
+
+  </details>
