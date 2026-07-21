@@ -7,27 +7,32 @@
 ## Core Features
 
 ### 1. Dual Keyboard Layout Engine
-* **Taiwan Zhuyin (Bopomofo) Mode**: Integrated custom phonetic engine that parses key sequences into bopomofo syllables, handles tones, and dynamically displays dictionary-assisted candidate lists for selection.
+* **Taiwan Zhuyin (Bopomofo) Mode**: Integrated custom phonetic engine supporting **smart continuous sentence typing** (composition buffer).
+  * **Continuous Input**: Type entire sentences continuously without early confirmation. Text is held in the composition buffer and rendered with a dashed underline.
+  * **Enter to Commit**: Confirm and commit the entire composition sentence by pressing `Enter`.
+  * **Up to Select Candidates**: Press `ArrowUp` to open the candidate list for the character immediately to the left of the cursor. Pressing `Enter` or a number key confirms/commits the selected candidate and closes the list, keeping the rest of the sentence uncommitted.
+  * **Cursor Navigation**: Full support for moving the cursor inside the composition buffer using Left/Right arrows or mouse clicks to edit phonetic keys or select candidates.
 * **English (US QWERTY) Mode**: A layout-independent typing capture system using physical keycodes (`e.code`), ensuring correct English character input regardless of your local operating system's keyboard layout. Fully simulates physical CapsLock and Shift XOR logic.
 
 ### 2. High-Fidelity Customization & Aesthetics
 * **Dynamic Presets**: Swap between beautifully crafted presets such as *Cyber Cyan, Charcoal Dark, Charcoal Light, Retro Mechanical, Vintage Beige, Wood Grain,* and *Sakura Pink*.
 * **Interactive RGB Lighting**: Enable dynamic multi-color RGB borders and breathing glow backlights under keycaps.
-* **Adjustable Typography**: Supports setting system scale and typing text area sizes dynamically from `6pt` to `32pt`.
+* **Adjustable Typography**: Supports setting system scale and typing text area sizes dynamically from `6 pt` to `32 pt` (obeying standard spacing guidelines).
 * **Collapsible Options Panel**: Personalization drawer with scroll overflow safety and a custom webkit scrollbar.
 
 ### 3. Checkbox-Based Hotkey Configurations
 * Configure your own layout switching shortcut in the **Advanced Settings** menu (collapsible via arrow toggle).
-* Select combinations of keys using checkboxes: `Ctrl`, `Space`, `Shift`, `CapsLock`, `Tab`, `Alt`, `L-Ctrl`, `R-Ctrl`, `L-Shift`, and `R-Shift`.
+* Select combinations of keys using checkboxes: `Ctrl`, `Space`, `Shift`, `Caps Lock`, `Tab`, `Alt`, `L-Ctrl`, `R-Ctrl`, `L-Shift`, and `R-Shift`.
 * Supports **smart modifier-only release** (e.g. smart short Shift press check) and instant **multi-key combinations** (e.g. `Ctrl + Space` or `L-Ctrl + Tab`) with automatic browser input suppression.
 
 ### 4. Segregated Emoji & Special Symbols Picker
 * Independent tab panels separating graphic **Emojis** from technical **Symbols** (Greek letters, mathematical operators, and special shapes).
 
 ### 5. Convenient Utilities
+* **Auto CJK Spacing**: Toggleable **pangu.js** integration in Advanced Settings. Automatically inserts correct spacing between Chinese and Western alphanumeric characters with smart cursor offset tracking.
 * **Word Counter**: Real-time character/word tracker positioned at the bottom-left of the typing zone, with extra scroll bottom-padding to prevent layout overlap.
 * **Copy/Clear Buttons**: Quick actions to copy typed text to clipboard or clear the input area.
-* **Bilingual UI**: Full internationalization (i18n) support for both **繁體中文** and **English**.
+* **Bilingual UI & SVG Brand Assets**: Full internationalization (i18n) support for both **繁體中文** and **English**, coupled with a crisp, custom SVG keycap logo serving as favicon and header brand identity.
 
 ---
 
