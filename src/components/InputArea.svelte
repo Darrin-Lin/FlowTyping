@@ -11,6 +11,8 @@
   export let onClear: () => void = () => {};
   export let inputFontSize: string = "18pt";
   export let lang: "zh" | "en" = "zh";
+  export let compositionCursor: number = 0;
+  export let onCompositionCursorChange: (cursor: number) => void = () => {};
 
   const t = {
     zh: {
@@ -52,9 +54,12 @@
   })();
 
   // Sync cursor selection down to textarea element
-  $: if (textareaEl && (textareaEl.selectionStart !== selectionStart || textareaEl.selectionEnd !== selectionEnd)) {
-    textareaEl.selectionStart = selectionStart;
-    textareaEl.selectionEnd = selectionEnd;
+  $: if (textareaEl) {
+    const targetCursor = composition ? selectionStart + compositionCursor : selectionStart;
+    if (textareaEl.selectionStart !== targetCursor || textareaEl.selectionEnd !== targetCursor) {
+      textareaEl.selectionStart = targetCursor;
+      textareaEl.selectionEnd = targetCursor;
+    }
   }
 
   function handleTextareaInput(e: Event) {
@@ -76,15 +81,9 @@
       if (composition) {
         const compLen = Array.from(composition).length;
         let start = textareaEl.selectionStart;
-        let end = textareaEl.selectionEnd;
-        // Clamp selection indices to account for injected composition
-        if (start > selectionStart) {
-          start = Math.max(selectionStart, start - compLen);
-        }
-        if (end > selectionStart) {
-          end = Math.max(selectionStart, end - compLen);
-        }
-        onSelectionChange(start, end);
+        const clickPos = Math.max(selectionStart, Math.min(selectionStart + compLen, start));
+        const newCompCursor = clickPos - selectionStart;
+        onCompositionCursorChange(newCompCursor);
       } else {
         onSelectionChange(textareaEl.selectionStart, textareaEl.selectionEnd);
       }
@@ -248,11 +247,11 @@
           return -1;
         })()}{@const isSelected = !isComp && originalIdx !== -1 && originalIdx >= selectionStart && originalIdx < selectionEnd}{@const isCaretHere = selectionStart === selectionEnd && (
           composition 
-            ? (idx === selectionStart + Array.from(composition).length)
+            ? (idx === selectionStart + compositionCursor)
             : (idx === selectionStart)
         )}{@const isRightCaretHere = selectionStart === selectionEnd && idx === displayChars.length - 1 && (
           composition
-            ? (selectionStart + Array.from(composition).length === displayChars.length)
+            ? (selectionStart + compositionCursor === displayChars.length)
             : (selectionStart === displayChars.length)
         )}<span 
           class="inline transition

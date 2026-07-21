@@ -82,6 +82,9 @@
   }
 
   function toggleKeyboardLayout() {
+    if (keyboardLayout === "zhuyin" && (stagedSyllables.length > 0 || !engine.isEmpty())) {
+      commitCompositionSentence();
+    }
     keyboardLayout = keyboardLayout === "zhuyin" ? "english" : "zhuyin";
   }
 
@@ -208,6 +211,8 @@
   }
   let candidates: string[] = [];
   let selectedCandidateIndex = 0;
+  let stagedSyllables: Array<{ char: string; pinyinKey: string }> = [];
+  let compositionCursor = 0;
 
   let toastMessage = "";
   let toastTimeout: any;
@@ -318,15 +323,28 @@
     cursorPos = selectionStart;
   }
 
+  function commitCompositionSentence() {
+    if (stagedSyllables.length > 0 || !engine.isEmpty()) {
+      const commitText = stagedSyllables.map(s => s.char).join("") + engine.getCompositionString();
+      insertAtCursor(commitText);
+      stagedSyllables = [];
+      compositionCursor = 0;
+      engine.reset();
+      composition = "";
+    }
+  }
+
+  function getCompositionString(): string {
+    const left = stagedSyllables.slice(0, compositionCursor).map(s => s.char).join("");
+    const right = stagedSyllables.slice(compositionCursor).map(s => s.char).join("");
+    return left + engine.getCompositionString() + right;
+  }
+
   function previewCandidateAtCursor(newCandidate: string) {
-    const arr = Array.from(text);
-    if (cursorPos > 0) {
-      arr.splice(cursorPos - 1, 1, newCandidate);
-      text = arr.join("");
-    } else {
-      arr.splice(0, 0, newCandidate);
-      text = arr.join("");
-      cursorPos = 1;
+    if (compositionCursor > 0 && stagedSyllables[compositionCursor - 1]) {
+      stagedSyllables[compositionCursor - 1].char = newCandidate;
+      stagedSyllables = [...stagedSyllables];
+      composition = getCompositionString();
     }
   }
 
@@ -340,6 +358,10 @@
     selectionStart = start;
     selectionEnd = end;
     cursorPos = end;
+  }
+
+  function handleCompositionCursorChange(cursor: number) {
+    compositionCursor = cursor;
   }
 
   function handleSymbolInput(symbol: string) {
@@ -356,22 +378,19 @@
 
     if (result.finalized && result.syllable) {
       const foundCandidates = dictLoader.getCandidates(result.syllable.pinyinKey);
+      const defaultChar = foundCandidates.length > 0 ? foundCandidates[0] : result.syllable.raw;
       
-      if (foundCandidates.length > 0) {
-        candidates = foundCandidates;
-        selectedCandidateIndex = 0;
-        insertAtCursor(candidates[0]);
-        composition = "";
-      } else {
-        insertAtCursor(result.syllable.raw);
-        composition = "";
-        candidates = [];
-      }
+      stagedSyllables.splice(compositionCursor, 0, {
+        char: defaultChar,
+        pinyinKey: result.syllable.pinyinKey
+      });
+      stagedSyllables = [...stagedSyllables];
+      compositionCursor++;
+      
+      candidates = [];
+      composition = getCompositionString();
     } else {
-      composition = engine.getCompositionString();
-      if (result.rawSymbol) {
-        insertAtCursor(result.rawSymbol);
-      }
+      composition = getCompositionString();
     }
   }
 
@@ -465,9 +484,7 @@
       if (k in ctrlPunctMap) {
         e.preventDefault();
         if (composition) {
-          insertAtCursor(composition);
-          engine.reset();
-          composition = "";
+          commitCompositionSentence();
         }
         insertAtCursor(ctrlPunctMap[k]);
         candidates = [];
@@ -545,9 +562,7 @@
       if (k in shiftMap) {
         e.preventDefault();
         if (composition) {
-          insertAtCursor(composition);
-          engine.reset();
-          composition = "";
+          commitCompositionSentence();
         }
         insertAtCursor(shiftMap[k]);
         candidates = [];
@@ -563,9 +578,7 @@
       if (k in normalMap) {
         e.preventDefault();
         if (composition) {
-          insertAtCursor(composition);
-          engine.reset();
-          composition = "";
+          commitCompositionSentence();
         }
         insertAtCursor(normalMap[k]);
         candidates = [];
@@ -591,8 +604,17 @@
     if (k === "Backspace") {
       e.preventDefault();
       if (composition.length > 0) {
-        engine.backspace();
-        composition = engine.getCompositionString();
+        if (!engine.isEmpty()) {
+          engine.backspace();
+        } else if (compositionCursor > 0) {
+          stagedSyllables.splice(compositionCursor - 1, 1);
+          stagedSyllables = [...stagedSyllables];
+          compositionCursor--;
+        }
+        composition = getCompositionString();
+        if (stagedSyllables.length === 0 && engine.isEmpty()) {
+          composition = "";
+        }
       } else if (selectionStart !== selectionEnd) {
         deleteSelection();
       } else if (cursorPos > 0) {
@@ -605,15 +627,39 @@
       }
       candidates = [];
     } else if (k === "ArrowLeft" || k === "ArrowRight") {
-      // Let browser handle native arrow key cursor movements and Shift+Arrow selection natively
+      if (composition.length > 0) {
+        if (k === "ArrowLeft" && compositionCursor > 0) {
+          e.preventDefault();
+          compositionCursor--;
+        } else if (k === "ArrowRight" && compositionCursor < stagedSyllables.length + engine.getCompositionString().length) {
+          e.preventDefault();
+          compositionCursor++;
+        }
+        return;
+      }
       return;
+    } else if (k === "ArrowUp") {
+      if (compositionCursor > 0 && stagedSyllables[compositionCursor - 1]) {
+        const pinyinKey = stagedSyllables[compositionCursor - 1].pinyinKey;
+        if (pinyinKey) {
+          candidates = dictLoader.getCandidates(pinyinKey);
+          if (candidates.length > 0) {
+            e.preventDefault();
+            selectedCandidateIndex = 0;
+            return;
+          }
+        }
+      }
     } else if (k === "Enter") {
       if (candidates.length > 0) {
         e.preventDefault();
-        candidates = [];
-        selectedCandidateIndex = 0;
-      } else if (composition) {
-        insertAtCursor(composition);
+        replaceCandidateAtCursor(candidates[selectedCandidateIndex]);
+      } else if (stagedSyllables.length > 0 || !engine.isEmpty()) {
+        e.preventDefault();
+        const commitText = stagedSyllables.map(s => s.char).join("") + engine.getCompositionString();
+        insertAtCursor(commitText);
+        stagedSyllables = [];
+        compositionCursor = 0;
         engine.reset();
         composition = "";
       } else {
@@ -626,6 +672,11 @@
         previewCandidateAtCursor(candidates[selectedCandidateIndex]);
       } else if (!engine.isEmpty()) {
         handleSymbolInput(" ");
+      } else if (stagedSyllables.length > 0) {
+        stagedSyllables.splice(compositionCursor, 0, { char: " ", pinyinKey: "" });
+        stagedSyllables = [...stagedSyllables];
+        compositionCursor++;
+        composition = getCompositionString();
       } else {
         insertAtCursor(" ");
         candidates = [];
@@ -684,11 +735,22 @@
     }
 
     if (symbol === '⌫') {
-      const arr = Array.from(text);
-      if (composition.length > 0) { engine.backspace(); composition = engine.getCompositionString(); }
-      else if (selectionStart !== selectionEnd) {
+      if (composition.length > 0) {
+        if (!engine.isEmpty()) {
+          engine.backspace();
+        } else if (compositionCursor > 0) {
+          stagedSyllables.splice(compositionCursor - 1, 1);
+          stagedSyllables = [...stagedSyllables];
+          compositionCursor--;
+        }
+        composition = getCompositionString();
+        if (stagedSyllables.length === 0 && engine.isEmpty()) {
+          composition = "";
+        }
+      } else if (selectionStart !== selectionEnd) {
         deleteSelection();
       } else if (cursorPos > 0) {
+        const arr = Array.from(text);
         arr.splice(cursorPos - 1, 1);
         text = arr.join("");
         selectionStart = cursorPos - 1;
@@ -698,10 +760,12 @@
       candidates = [];
     } else if (symbol === 'Enter ↵') {
       if (candidates.length > 0) {
-        candidates = [];
-        selectedCandidateIndex = 0;
-      } else if (composition) { insertAtCursor(composition); engine.reset(); composition = ""; }
-      else insertAtCursor("\n");
+        replaceCandidateAtCursor(candidates[selectedCandidateIndex]);
+      } else if (stagedSyllables.length > 0 || !engine.isEmpty()) {
+        commitCompositionSentence();
+      } else {
+        insertAtCursor("\n");
+      }
       candidates = [];
     } else {
       if (keyboardLayout === "zhuyin") {
@@ -714,9 +778,7 @@
         };
         if (symbol in normalMap) {
           if (composition) {
-            insertAtCursor(composition);
-            engine.reset();
-            composition = "";
+            commitCompositionSentence();
           }
           insertAtCursor(normalMap[symbol]);
           candidates = [];
@@ -740,6 +802,8 @@
   function handleClear() {
     text = "";
     engine.reset();
+    stagedSyllables = [];
+    compositionCursor = 0;
     composition = "";
     candidates = [];
     selectionStart = 0;
@@ -880,7 +944,9 @@
       {inputBoxStyle}
       {inputFontSize}
       {lang}
+      {compositionCursor}
       onSelectionChange={handleSelectionChange}
+      onCompositionCursorChange={handleCompositionCursorChange}
       onCopy={handleCopy}
       onClear={handleClear}
     />
