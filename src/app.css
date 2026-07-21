@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+  }
+}
+
+/* Custom premium textures & animations */
+
+/* Dark Gray/Black Casing */
+.bg-casing-dark {
+  background: linear-gradient(135deg, #121214 0%, #070708 100%);
+}
+
+/* Silver Gray Casing */
+.bg-casing-silver {
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+}
+
+/* Walnut Wood Grain */
+.bg-wood {
+  background: linear-gradient(135deg, #27140b 0%, #3e1f13 50%, #1e0d06 100%);
+}
+.bg-wood-texture {
+  position: relative;
+}
+.bg-wood-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background: 
+    repeating-linear-gradient(85deg, transparent, transparent 4px, rgba(0, 0, 0, 0.3) 4px, rgba(0, 0, 0, 0.3) 5px),
+    repeating-linear-gradient(175deg, transparent, transparent 10px, rgba(0, 0, 0, 0.15) 10px, rgba(0, 0, 0, 0.15) 12px);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Frosted White Plastic */
+.bg-plastic {
+  background: radial-gradient(circle at 50% 30%, #f8fafc 0%, #cbd5e1 100%);
+}
+
+/* Sakura Pink Case Material */
+.bg-plastic-pink {
+  background: radial-gradient(circle at 50% 30%, #ffeef2 0%, #fbc2d0 100%);
+}
+
+/* CRT Screen Effect */
+@keyframes crt-flicker {
+  0% { opacity: 0.975; }
+  50% { opacity: 0.995; }
+  100% { opacity: 0.975; }
+}
+.crt-screen-glow {
+  animation: crt-flicker 0.25s infinite;
+  text-shadow: 0 0 6px rgba(118, 255, 3, 0.8), 0 0 2px rgba(118, 255, 3, 0.4);
+}
+.crt-overlay::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+  background-size: 100% 4px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* RGB Flow animation */
+@keyframes rgb-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.rgb-glow-border {
+  background: linear-gradient(90deg, #ff007f, #7f00ff, #00f0ff, #00ff7f, #ff007f);
+  background-size: 300% 100%;
+  animation: rgb-flow 6s linear infinite;
+}
