@@ -13,6 +13,7 @@
   export let lang: "zh" | "en" = "zh";
   export let compositionCursor: number = 0;
   export let onCompositionCursorChange: (cursor: number) => void = () => {};
+  export let wordWrap: boolean = false;
 
   const t = {
     zh: {
@@ -93,7 +94,49 @@
   function handleTextareaScroll() {
     if (textareaEl && renderedViewEl) {
       renderedViewEl.scrollTop = textareaEl.scrollTop;
+      renderedViewEl.scrollLeft = textareaEl.scrollLeft;
     }
+  }
+
+  function scrollCaretIntoView() {
+    if (!textareaEl || !renderedViewEl) return;
+    requestAnimationFrame(() => {
+      const caretEl = renderedViewEl.querySelector('.custom-caret-left, .custom-caret-right') as HTMLElement;
+      if (caretEl) {
+        const containerHeight = renderedViewEl.clientHeight;
+        const caretTop = caretEl.offsetTop;
+        const caretHeight = caretEl.offsetHeight || 24;
+
+        // Auto scroll vertically to keep current typing line at the bottom of the visible area
+        if (caretTop + caretHeight > textareaEl.scrollTop + containerHeight) {
+          const newScrollTop = Math.max(0, caretTop + caretHeight - containerHeight + 8);
+          textareaEl.scrollTop = newScrollTop;
+          renderedViewEl.scrollTop = newScrollTop;
+        } else if (caretTop < textareaEl.scrollTop) {
+          const newScrollTop = Math.max(0, caretTop - 8);
+          textareaEl.scrollTop = newScrollTop;
+          renderedViewEl.scrollTop = newScrollTop;
+        }
+
+        // Auto scroll horizontally if horizontal overflow occurs
+        const containerWidth = renderedViewEl.clientWidth;
+        const caretLeft = caretEl.offsetLeft;
+        const caretWidth = caretEl.offsetWidth || 10;
+        if (caretLeft + caretWidth > textareaEl.scrollLeft + containerWidth) {
+          const newScrollLeft = Math.max(0, caretLeft + caretWidth - containerWidth + 12);
+          textareaEl.scrollLeft = newScrollLeft;
+          renderedViewEl.scrollLeft = newScrollLeft;
+        } else if (caretLeft < textareaEl.scrollLeft) {
+          const newScrollLeft = Math.max(0, caretLeft - 12);
+          textareaEl.scrollLeft = newScrollLeft;
+          renderedViewEl.scrollLeft = newScrollLeft;
+        }
+      }
+    });
+  }
+
+  $: if (displayChars || selectionStart || compositionCursor || textareaValue) {
+    scrollCaretIntoView();
   }
 
   onMount(() => {
@@ -157,7 +200,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div 
-  class="w-full max-w-3xl mx-auto mb-6 rounded-2xl transition-all duration-300 relative overflow-hidden h-[150px]
+  class="w-full max-w-3xl mx-auto mb-6 rounded-2xl transition-shadow duration-300 relative overflow-hidden min-h-[140px] h-[160px] max-h-[550px] resize-y
     {inputBoxStyle === 'cyber-glow' ? 'bg-zinc-950/90 border-2 border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.25)] text-cyan-50' : ''}
     {inputBoxStyle === 'cyberpunk-red' ? 'bg-zinc-950/90 border-2 border-red-500/50 shadow-[0_0_25px_rgba(239,68,68,0.25)] text-red-50' : ''}
     {inputBoxStyle === 'crt-terminal' ? 'bg-[#2b3a2a] border-4 border-[#3a4b39] shadow-inner text-[#76ff03] rounded-none crt-overlay' : ''}
@@ -218,6 +261,13 @@
     </svg>
   </button>
 
+  <!-- Resize Grip Handle Indicator (Bottom Right Corner) -->
+  <div class="absolute bottom-0.5 right-0.5 pointer-events-none opacity-20 select-none z-30">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 fill-current opacity-70" viewBox="0 0 16 16">
+      <path d="M14 14H12V12H14V14ZM14 10H12V8H14V10ZM10 14H8V12H10V14Z"/>
+    </svg>
+  </div>
+
   <!-- Scroll Container -->
   <div class="w-full h-full pt-8 pb-8 pl-5 pr-12 relative">
     
@@ -230,7 +280,7 @@
       on:keyup={handleTextareaSelect}
       on:mouseup={handleTextareaSelect}
       on:scroll={handleTextareaScroll}
-      class="absolute top-8 left-5 right-12 bottom-8 bg-transparent text-transparent resize-none select-text outline-none border-none tracking-normal leading-relaxed break-all caret-transparent z-20 whitespace-pre-wrap font-mono"
+      class="absolute top-8 left-5 right-12 bottom-8 bg-transparent text-transparent resize-none select-text outline-none border-none tracking-normal leading-relaxed caret-transparent z-20 font-mono {wordWrap ? 'whitespace-pre-wrap break-all' : 'whitespace-pre overflow-x-auto'}"
       style="font-size: {inputFontSize};"
       placeholder={t[lang].placeholder}
     ></textarea>
@@ -238,7 +288,7 @@
     <!-- Custom Rendered View (Z-10: Renders the visual glow, cursor, and selection highlight underneath) -->
     <div 
       bind:this={renderedViewEl}
-      class="absolute top-8 left-5 right-12 bottom-8 overflow-y-auto tracking-normal leading-relaxed break-all z-10 pointer-events-none select-none whitespace-pre-wrap scrollbar-none font-mono {inputBoxStyle === 'crt-terminal' ? 'crt-screen-glow' : ''}"
+      class="absolute top-8 left-5 right-12 bottom-8 overflow-y-auto tracking-normal leading-relaxed z-10 pointer-events-none select-none scrollbar-none font-mono {wordWrap ? 'whitespace-pre-wrap break-all' : 'whitespace-pre overflow-x-auto'} {inputBoxStyle === 'crt-terminal' ? 'crt-screen-glow' : ''}"
       style="font-size: {inputFontSize};"
     >{#each displayChars as char, idx}{@const isComp = composition && idx >= selectionStart && idx < selectionStart + Array.from(composition).length}{@const originalIdx = (() => {
           if (!composition) return idx;

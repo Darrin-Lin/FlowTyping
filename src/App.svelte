@@ -60,6 +60,7 @@
   let shiftPressedTime = 0;
   let otherKeyPressedWhileShift = false;
   let autoSpacingEnabled = false;
+  let wordWrap = false;
 
   let lastFormattedText = "";
   $: if (autoSpacingEnabled && text && text !== lastFormattedText) {
@@ -920,6 +921,7 @@
           {lang}
           {shortcutConfig}
           {autoSpacingEnabled}
+          {wordWrap}
           onPresetChange={(p) => applyPreset(p as any)}
           onKeyboardStyleChange={(s) => { keyboardStyle = s; handleCustomChange(); }}
           onKeycapColorChange={(k) => { keycapColor = k as any; handleCustomChange(); }}
@@ -931,6 +933,7 @@
           onInputFontSizeChange={(f) => { inputFontSize = f; handleCustomChange(); }}
           onShortcutConfigChange={(config) => { shortcutConfig = config; handleCustomChange(); }}
           onAutoSpacingToggle={() => { autoSpacingEnabled = !autoSpacingEnabled; handleCustomChange(); }}
+          onWordWrapToggle={() => { wordWrap = !wordWrap; handleCustomChange(); }}
         />
       </div>
     {/if}
@@ -945,6 +948,7 @@
       {inputFontSize}
       {lang}
       {compositionCursor}
+      {wordWrap}
       onSelectionChange={handleSelectionChange}
       onCompositionCursorChange={handleCompositionCursorChange}
       onCopy={handleCopy}

@@ -34,6 +34,8 @@
   export let onShortcutConfigChange: (config: any) => void = () => {};
   export let autoSpacingEnabled: boolean = false;
   export let onAutoSpacingToggle: () => void = () => {};
+  export let wordWrap: boolean = true;
+  export let onWordWrapToggle: () => void = () => {};
 
   const t = {
     zh: {
@@ -56,6 +58,7 @@
       shortcutLabel: "切換快捷鍵（可複選）",
       noneLabel: "無",
       autoSpacing: "中英文自動空格（pangu.js）",
+      wordWrap: "打字區自動折行（Word Wrap）",
       keys: {
         ctrl: "Ctrl",
         space: "Space",
@@ -134,6 +137,7 @@
       shortcutLabel: "Switch Hotkey (Checkboxes)",
       noneLabel: "None",
       autoSpacing: "Auto CJK Spacing (pangu.js)",
+      wordWrap: "Auto Word Wrap",
       keys: {
         ctrl: "Ctrl",
         space: "Space",
@@ -448,6 +452,19 @@
             class="w-3.5 h-3.5 rounded cursor-pointer accent-zinc-850 dark:accent-zinc-200"
           />
           <span class="font-semibold text-[11px]">{t[lang].autoSpacing}</span>
+        </label>
+
+        <!-- Word Wrap toggle -->
+        <label class="flex items-center gap-2 cursor-pointer mt-1.5 p-2 rounded-lg border select-none hover:opacity-85
+          {backgroundStyle === 'dark' ? 'bg-zinc-955 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-750'}
+        ">
+          <input
+            type="checkbox"
+            checked={wordWrap}
+            on:change={onWordWrapToggle}
+            class="w-3.5 h-3.5 rounded cursor-pointer accent-zinc-850 dark:accent-zinc-200"
+          />
+          <span class="font-semibold text-[11px]">{t[lang].wordWrap}</span>
         </label>
       </div>
     {/if}
