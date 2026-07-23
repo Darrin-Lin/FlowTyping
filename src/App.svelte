@@ -61,6 +61,15 @@
   let otherKeyPressedWhileShift = false;
   let autoSpacingEnabled = false;
   let wordWrap = false;
+  let keyboardMappingMode: "native" | "us-layout" = "native";
+
+  // Standard QWERTY physical key code (e.code) to Zhuyin (Bopomofo) mapping
+  const CODE_TO_ZHUYIN: Record<string, string> = {
+    Digit1: 'ㄅ', Digit2: 'ㄉ', Digit3: 'ˇ', Digit4: 'ˋ', Digit5: 'ㄓ', Digit6: 'ˊ', Digit7: '˙', Digit8: 'ㄚ', Digit9: 'ㄞ', Digit0: 'ㄢ', Minus: 'ㄦ',
+    KeyQ: 'ㄆ', KeyW: 'ㄊ', KeyE: 'ㄍ', KeyR: 'ㄐ', KeyT: 'ㄔ', KeyY: 'ㄗ', KeyU: 'ㄧ', KeyI: 'ㄛ', KeyO: 'ㄟ', KeyP: 'ㄣ',
+    KeyA: 'ㄇ', KeyS: 'ㄋ', KeyD: 'ㄎ', KeyF: 'ㄑ', KeyG: 'ㄕ', KeyH: 'ㄘ', KeyJ: 'ㄨ', KeyK: 'ㄜ', KeyL: 'ㄠ', Semicolon: 'ㄤ',
+    KeyZ: 'ㄈ', KeyX: 'ㄌ', KeyC: 'ㄏ', KeyV: 'ㄒ', KeyB: 'ㄖ', KeyN: 'ㄙ', KeyM: 'ㄩ', Comma: 'ㄝ', Period: 'ㄡ', Slash: 'ㄥ'
+  };
 
   let lastFormattedText = "";
   $: if (autoSpacingEnabled && text && text !== lastFormattedText) {
@@ -626,13 +635,23 @@
         return;
       }
       
-      // Map physical code to English character!
-      const englishChar = mapCodeToEnglish(code, e.shiftKey);
-      if (englishChar !== null) {
-        e.preventDefault();
-        insertAtCursor(englishChar);
-        candidates = [];
-        return;
+      // Map physical code to English character if in US Layout simulation mode
+      if (keyboardMappingMode === "us-layout") {
+        const englishChar = mapCodeToEnglish(code, e.shiftKey);
+        if (englishChar !== null) {
+          e.preventDefault();
+          insertAtCursor(englishChar);
+          candidates = [];
+          return;
+        }
+      } else {
+        // If a single character is pressed without ctrl/alt/meta, insert it directly (respecting native keyboard layout)
+        if (k.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+          e.preventDefault();
+          insertAtCursor(k);
+          candidates = [];
+          return;
+        }
       }
       return;
     }
@@ -787,6 +806,9 @@
       if (idx < candidates.length) {
         replaceCandidateAtCursor(candidates[idx]);
       }
+    } else if (keyboardMappingMode === "us-layout" && e.code in CODE_TO_ZHUYIN) {
+      e.preventDefault();
+      handleSymbolInput(CODE_TO_ZHUYIN[e.code]);
     } else if (isDirectZhuyin(k)) {
       e.preventDefault();
       handleSymbolInput(k);
@@ -1026,6 +1048,7 @@
           {shortcutConfig}
           {autoSpacingEnabled}
           {wordWrap}
+          {keyboardMappingMode}
           onPresetChange={(p) => applyPreset(p as any)}
           onKeyboardStyleChange={(s) => { keyboardStyle = s; handleCustomChange(); }}
           onKeycapColorChange={(k) => { keycapColor = k as any; handleCustomChange(); }}
@@ -1038,6 +1061,7 @@
           onShortcutConfigChange={(config) => { shortcutConfig = config; handleCustomChange(); }}
           onAutoSpacingToggle={() => { autoSpacingEnabled = !autoSpacingEnabled; handleCustomChange(); }}
           onWordWrapToggle={() => { wordWrap = !wordWrap; handleCustomChange(); }}
+          onKeyboardMappingModeChange={(m) => { keyboardMappingMode = m; handleCustomChange(); }}
         />
       </div>
     {/if}

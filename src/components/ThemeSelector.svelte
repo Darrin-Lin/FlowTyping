@@ -6,6 +6,7 @@
   export let material: string = "dark-gray";
   export let backgroundStyle: "dark" | "bright" = "dark";
   export let rgbEnabled: boolean = false;
+  export let keyboardMappingMode: "native" | "us-layout" = "native";
 
   export let onPresetChange: (p: string) => void = () => {};
   export let onKeyboardStyleChange: (s: "esports" | "retro") => void = () => {};
@@ -14,6 +15,7 @@
   export let onMaterialChange: (m: string) => void = () => {};
   export let onBackgroundStyleChange: (b: "dark" | "bright") => void = () => {};
   export let onRgbToggle: () => void = () => {};
+  export let onKeyboardMappingModeChange: (m: "native" | "us-layout") => void = () => {};
   export let systemFontSize: string = "md";
   export let inputFontSize: string = "18pt";
   export let onSystemFontSizeChange: (s: string) => void = () => {};
@@ -50,6 +52,11 @@
       uiScale: "系統大小",
       textSize: "打字區大小",
       keyboardLayout: "鍵盤配置",
+      keyboardMapping: "鍵盤對應模式",
+      mappingModes: {
+        native: "目前鍵盤",
+        usLayout: "美式鍵盤"
+      },
       layouts: {
         zhuyin: "注音",
         english: "英文"
@@ -129,6 +136,11 @@
       uiScale: "UI Scale",
       textSize: "Text Size",
       keyboardLayout: "Keyboard Layout",
+      keyboardMapping: "Keyboard Mapping Mode",
+      mappingModes: {
+        native: "Current Keyboard",
+        usLayout: "US Keyboard"
+      },
       layouts: {
         zhuyin: "Zhuyin",
         english: "English"
@@ -384,6 +396,20 @@
         <option value="20pt">20 pt</option>
         <option value="24pt">24 pt</option>
         <option value="32pt">32 pt</option>
+      </select>
+    </div>
+
+    <!-- Keyboard Mapping Mode -->
+    <div class="flex flex-col gap-1">
+      <span class="font-semibold opacity-70">{t[lang].keyboardMapping}</span>
+      <select
+        value={keyboardMappingMode}
+        on:change={(e) => onKeyboardMappingModeChange(e.currentTarget.value as any)}
+        class="border rounded p-1.5 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 cursor-pointer
+          {backgroundStyle === 'dark' ? 'bg-zinc-900 border-zinc-800 text-zinc-200' : 'bg-white border-zinc-200 text-zinc-800'}"
+      >
+        <option value="native">{t[lang].mappingModes.native}</option>
+        <option value="us-layout">{t[lang].mappingModes.usLayout}</option>
       </select>
     </div>
   </div>
