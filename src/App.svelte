@@ -215,6 +215,36 @@
   let stagedSyllables: Array<{ char: string; pinyinKey: string }> = [];
   let compositionCursor = 0;
 
+  function findFocusedSyllableIndex(cursor: number, syllables: Array<{ char: string; pinyinKey: string }>): number {
+    if (syllables.length === 0) return -1;
+
+    const isSelectable = (idx: number) => {
+      if (idx >= 0 && idx < syllables.length) {
+        const s = syllables[idx];
+        if (s && s.pinyinKey) {
+          const cands = dictLoader.getCandidates(s.pinyinKey);
+          return cands.length > 0;
+        }
+      }
+      return false;
+    };
+
+    const leftIdx = cursor - 1;
+    const rightIdx = cursor;
+
+    // 1. If the character to the left of the cursor is selectable, focus it
+    if (isSelectable(leftIdx)) {
+      return leftIdx;
+    }
+
+    // 2. Otherwise, if the character to the right is selectable, focus it
+    if (isSelectable(rightIdx)) {
+      return rightIdx;
+    }
+
+    return -1;
+  }
+
   let toastMessage = "";
   let toastTimeout: any;
 
@@ -397,8 +427,9 @@
   }
 
   function previewCandidateAtCursor(newCandidate: string) {
-    if (compositionCursor > 0 && stagedSyllables[compositionCursor - 1]) {
-      stagedSyllables[compositionCursor - 1].char = newCandidate;
+    const focusedIdx = findFocusedSyllableIndex(compositionCursor, stagedSyllables);
+    if (focusedIdx !== -1 && stagedSyllables[focusedIdx]) {
+      stagedSyllables[focusedIdx].char = newCandidate;
       stagedSyllables = [...stagedSyllables];
       composition = getCompositionString();
     }
@@ -699,8 +730,9 @@
       moveTextCursor(k === "ArrowLeft" ? "left" : "right", e.shiftKey);
       return;
     } else if (k === "ArrowUp") {
-      if (compositionCursor > 0 && stagedSyllables[compositionCursor - 1]) {
-        const pinyinKey = stagedSyllables[compositionCursor - 1].pinyinKey;
+      const focusedIdx = findFocusedSyllableIndex(compositionCursor, stagedSyllables);
+      if (focusedIdx !== -1 && stagedSyllables[focusedIdx]) {
+        const pinyinKey = stagedSyllables[focusedIdx].pinyinKey;
         if (pinyinKey) {
           candidates = dictLoader.getCandidates(pinyinKey);
           if (candidates.length > 0) {
