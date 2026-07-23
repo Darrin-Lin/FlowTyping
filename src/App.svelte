@@ -245,6 +245,22 @@
     return -1;
   }
 
+  function triggerCandidateSelection(): boolean {
+    const focusedIdx = findFocusedSyllableIndex(compositionCursor, stagedSyllables);
+    if (focusedIdx !== -1 && stagedSyllables[focusedIdx]) {
+      const pinyinKey = stagedSyllables[focusedIdx].pinyinKey;
+      if (pinyinKey) {
+        const foundCandidates = dictLoader.getCandidates(pinyinKey);
+        if (foundCandidates.length > 0) {
+          candidates = foundCandidates;
+          selectedCandidateIndex = 0;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   let toastMessage = "";
   let toastTimeout: any;
 
@@ -730,17 +746,9 @@
       moveTextCursor(k === "ArrowLeft" ? "left" : "right", e.shiftKey);
       return;
     } else if (k === "ArrowUp") {
-      const focusedIdx = findFocusedSyllableIndex(compositionCursor, stagedSyllables);
-      if (focusedIdx !== -1 && stagedSyllables[focusedIdx]) {
-        const pinyinKey = stagedSyllables[focusedIdx].pinyinKey;
-        if (pinyinKey) {
-          candidates = dictLoader.getCandidates(pinyinKey);
-          if (candidates.length > 0) {
-            e.preventDefault();
-            selectedCandidateIndex = 0;
-            return;
-          }
-        }
+      if (triggerCandidateSelection()) {
+        e.preventDefault();
+        return;
       }
     } else if (k === "Enter") {
       if (candidates.length > 0) {
@@ -823,6 +831,11 @@
         activeKeys.add('ShiftLeft');
       }
       activeKeys = new Set(activeKeys);
+      return;
+    }
+
+    if (key === 'ArrowUp' || symbol === '選字') {
+      triggerCandidateSelection();
       return;
     }
 

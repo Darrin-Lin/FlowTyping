@@ -361,6 +361,40 @@
           </div>
         </button>
 
+        <!-- Selection Button -->
+        <button
+          type="button"
+          tabindex="-1"
+          on:mousedown={handleButtonMouseDown}
+          on:click={(e) => {
+            (e.currentTarget as HTMLButtonElement).blur();
+            onKeyPress('ArrowUp', '選字');
+          }}
+          class="h-11 px-3.5 rounded-lg font-semibold flex items-center gap-1.5 cursor-pointer transition-all text-sm relative overflow-hidden
+            {rgbEnabled ? 'p-[1.5px] rgb-glow-border shadow-[0_0_8px_rgba(0,240,255,0.25)]' : ''}
+          "
+        >
+          <div class="w-full h-full flex items-center justify-center rounded-[6px] px-3
+            {theme === 'retro' ? 'rounded-none' : ''}
+            {!rgbEnabled && keycapColor === 'cyber-cyan' ? 'bg-purple-900/60 border border-purple-500/50 text-purple-200 hover:bg-purple-800' : ''}
+            {!rgbEnabled && keycapColor === 'bow' ? 'bg-white border border-zinc-200 text-black hover:bg-zinc-100 shadow-sm' : ''}
+            {!rgbEnabled && keycapColor === 'white-grey' ? 'bg-white border border-zinc-200 text-zinc-400 hover:bg-zinc-50 shadow-sm' : ''}
+            {!rgbEnabled && keycapColor === 'vintage-beige' ? 'bg-[#d0d4cf] border-2 border-[#868a85] text-black font-bold shadow-[2px_2px_0px_rgba(0,0,0,0.2)]' : ''}
+            {!rgbEnabled && keycapColor === 'minimal-charcoal' ? 'bg-zinc-800 border border-zinc-700 text-zinc-100 hover:bg-zinc-700' : ''}
+            {!rgbEnabled && keycapColor === 'sakura-pink' ? 'bg-pink-100 border border-pink-200 text-pink-700 hover:bg-pink-150' : ''}
+            {!rgbEnabled && keycapColor === 'pastel-purple' ? 'bg-purple-100 border border-purple-200 text-purple-700 hover:bg-purple-150' : ''}
+            {rgbEnabled && keycapColor === 'cyber-cyan' ? 'bg-zinc-955 text-cyan-400' : ''}
+            {rgbEnabled && keycapColor === 'bow' ? 'bg-white text-black' : ''}
+            {rgbEnabled && keycapColor === 'white-grey' ? 'bg-white text-zinc-400' : ''}
+            {rgbEnabled && keycapColor === 'vintage-beige' ? 'bg-[#e5e9e4] text-black' : ''}
+            {rgbEnabled && keycapColor === 'minimal-charcoal' ? 'bg-zinc-900 text-zinc-100' : ''}
+            {rgbEnabled && keycapColor === 'sakura-pink' ? 'bg-pink-50 text-pink-700' : ''}
+            {rgbEnabled && keycapColor === 'pastel-purple' ? 'bg-purple-50 text-purple-700' : ''}
+          ">
+            <span>選字</span>
+          </div>
+        </button>
+
         <button
           type="button"
           tabindex="-1"

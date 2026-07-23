@@ -283,6 +283,7 @@
       on:keyup={handleTextareaSelect}
       on:mouseup={handleTextareaSelect}
       on:scroll={handleTextareaScroll}
+      inputmode="none"
       class="absolute top-8 left-5 right-12 bottom-8 bg-transparent text-transparent resize-none select-text outline-none border-none tracking-normal leading-relaxed caret-transparent z-20 font-mono {wordWrap ? 'whitespace-pre-wrap break-all' : 'whitespace-pre overflow-x-auto'}"
       style="font-size: {inputFontSize};"
       placeholder={t[lang].placeholder}
