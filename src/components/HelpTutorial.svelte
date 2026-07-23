@@ -54,7 +54,7 @@
       
       // Tab 4
       settingsTitle: "系統與主題設定面板",
-      settingsDesc: "點擊右上角「齒輪」圖示開啟設定面板，您能自訂所有的外觀與輸入偏好：",
+      settingsDesc: "點擊右上角「🌐 繁中 / EN」可切換介面語言。點擊「齒輪」圖示開啟設定面板可自訂以下偏好：",
       settingsPoint1_1: "預設風格：提供電競、復古、低調與極簡黑。",
       settingsPoint1_2: "配色燈效：自訂鍵帽與背景，支援多彩霓虹燈效。",
       settingsPoint2_1: "按鍵配置：支援原生對照或模擬美規對照。",
@@ -109,7 +109,7 @@
       
       // Tab 4
       settingsTitle: "System & Theme Settings",
-      settingsDesc: "Click the gear icon in the top-right to open settings and customize your preferences:",
+      settingsDesc: "Click the \"🌐 繁中 / EN\" button on the top-right to switch interface language. Click the gear icon to customize preferences:",
       settingsPoint1_1: "Presets: Esports, Retro, Low Profile, or Minimal Dark.",
       settingsPoint1_2: "Colors & RGB: Customize keycaps, backgrounds, and neon glow.",
       settingsPoint2_1: "Key Mapping: Toggle Native or simulated US Layout mapping.",

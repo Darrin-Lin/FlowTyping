@@ -1002,14 +1002,17 @@
       <button
         type="button"
         on:click={toggleLanguage}
-        class="text-xs font-semibold px-2 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer select-none
+        class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer select-none flex items-center gap-1
           {backgroundStyle === 'dark' 
-            ? 'bg-zinc-900 hover:bg-zinc-850 text-zinc-400 border-zinc-800 hover:text-zinc-200' 
-            : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-650 border-zinc-200 hover:text-zinc-800'}"
+            ? 'bg-zinc-900 hover:bg-zinc-850 text-zinc-350 border-zinc-800 hover:text-white' 
+            : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200 hover:text-zinc-900'}"
         title={lang === 'zh' ? 'Switch to English' : '切換至中文'}
         aria-label="Toggle language"
       >
-        {lang === 'zh' ? 'EN' : '中'}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+        </svg>
+        <span>{lang === 'zh' ? '繁中' : 'EN'}</span>
       </button>
 
       <!-- Toggle Help/Tutorial Button -->
