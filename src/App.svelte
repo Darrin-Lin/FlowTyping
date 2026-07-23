@@ -302,6 +302,61 @@
     e.preventDefault();
   }
 
+  function moveTextCursor(direction: "left" | "right", isShift: boolean) {
+    const textLen = Array.from(text).length;
+    if (direction === "left") {
+      if (isShift) {
+        if (cursorPos === selectionStart) {
+          if (selectionStart > 0) {
+            selectionStart--;
+            cursorPos = selectionStart;
+          }
+        } else {
+          if (selectionEnd > selectionStart) {
+            selectionEnd--;
+            cursorPos = selectionEnd;
+          }
+        }
+      } else {
+        if (selectionStart !== selectionEnd) {
+          const newPos = Math.min(selectionStart, selectionEnd);
+          selectionStart = newPos;
+          selectionEnd = newPos;
+          cursorPos = newPos;
+        } else if (selectionStart > 0) {
+          selectionStart--;
+          selectionEnd = selectionStart;
+          cursorPos = selectionStart;
+        }
+      }
+    } else {
+      if (isShift) {
+        if (cursorPos === selectionEnd) {
+          if (selectionEnd < textLen) {
+            selectionEnd++;
+            cursorPos = selectionEnd;
+          }
+        } else {
+          if (selectionStart < selectionEnd) {
+            selectionStart++;
+            cursorPos = selectionStart;
+          }
+        }
+      } else {
+        if (selectionStart !== selectionEnd) {
+          const newPos = Math.max(selectionStart, selectionEnd);
+          selectionStart = newPos;
+          selectionEnd = newPos;
+          cursorPos = newPos;
+        } else if (selectionStart < textLen) {
+          selectionStart++;
+          selectionEnd = selectionStart;
+          cursorPos = selectionStart;
+        }
+      }
+    }
+  }
+
   function insertAtCursor(chars: string) {
     const arr = Array.from(text);
     const start = selectionStart;
@@ -519,6 +574,8 @@
         return;
       }
       if (k === "ArrowLeft" || k === "ArrowRight") {
+        e.preventDefault();
+        moveTextCursor(k === "ArrowLeft" ? "left" : "right", e.shiftKey);
         return;
       }
       
@@ -638,6 +695,8 @@
         }
         return;
       }
+      e.preventDefault();
+      moveTextCursor(k === "ArrowLeft" ? "left" : "right", e.shiftKey);
       return;
     } else if (k === "ArrowUp") {
       if (compositionCursor > 0 && stagedSyllables[compositionCursor - 1]) {

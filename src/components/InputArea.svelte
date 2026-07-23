@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   export let text: string = "";
   export let composition: string = "";
@@ -56,11 +56,14 @@
 
   // Sync cursor selection down to textarea element
   $: if (textareaEl) {
-    const targetCursor = composition ? selectionStart + compositionCursor : selectionStart;
-    if (textareaEl.selectionStart !== targetCursor || textareaEl.selectionEnd !== targetCursor) {
-      textareaEl.selectionStart = targetCursor;
-      textareaEl.selectionEnd = targetCursor;
-    }
+    const targetStart = composition ? selectionStart + compositionCursor : selectionStart;
+    const targetEnd = composition ? selectionStart + compositionCursor : selectionEnd;
+    tick().then(() => {
+      if (textareaEl.selectionStart !== targetStart || textareaEl.selectionEnd !== targetEnd) {
+        textareaEl.selectionStart = targetStart;
+        textareaEl.selectionEnd = targetEnd;
+      }
+    });
   }
 
   function handleTextareaInput(e: Event) {
