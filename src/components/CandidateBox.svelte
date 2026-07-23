@@ -3,6 +3,7 @@
   export let selectedIndex: number = 0;
   export let theme: "esports" | "retro" | "low-profile" | "minimal-dark" = "esports";
   export let onSelect: (candidate: string) => void = () => {};
+  export let lang: "zh" | "en" = "zh";
 </script>
 
 {#if candidates.length > 0}
@@ -12,7 +13,9 @@
     {theme === 'low-profile' ? 'bg-white border border-slate-200 shadow-md text-slate-800' : ''}
     {theme === 'minimal-dark' ? 'bg-zinc-900/95 border border-zinc-800 shadow-md text-zinc-100' : ''}
   ">
-    <span class="text-xs font-semibold opacity-60 px-2">選字候選 (數字鍵或點擊選字):</span>
+    <span class="text-xs font-semibold opacity-60 px-2">
+      {lang === 'zh' ? '選字候選 (數字鍵或點擊選字):' : 'Candidates (Press number or click):'}
+    </span>
     
     <div class="flex flex-wrap items-center gap-1.5">
       {#each candidates as candidate, i}

@@ -4,6 +4,7 @@
   import CandidateBox from "./components/CandidateBox.svelte";
   import Keyboard from "./components/Keyboard.svelte";
   import EmojiPicker from "./components/EmojiPicker.svelte";
+  import HelpTutorial from "./components/HelpTutorial.svelte";
   import ThemeSelector from "./components/ThemeSelector.svelte";
   import { ZhuyinEngine, CONSONANTS, MEDIALS, VOWELS, TONES } from "./engine/ZhuyinEngine";
   import { DictionaryLoader } from "./engine/DictionaryLoader";
@@ -39,6 +40,7 @@
   let rgbEnabled = false;
 
   let isEmojiOpen = false;
+  let isHelpOpen = false;
   let isSettingsOpen = false;
   let pickerMode: "emoji" | "symbol" = "emoji";
   let systemFontSize: "sm" | "md" | "lg" | "xl" = "md";
@@ -1010,6 +1012,22 @@
         {lang === 'zh' ? 'EN' : '中'}
       </button>
 
+      <!-- Toggle Help/Tutorial Button -->
+      <button
+        type="button"
+        on:click={() => isHelpOpen = !isHelpOpen}
+        class="p-1.5 rounded-lg border transition-all duration-200 cursor-pointer
+          {isHelpOpen 
+            ? (backgroundStyle === 'dark' ? 'bg-zinc-100 border-zinc-100 text-zinc-900' : 'bg-zinc-900 border-zinc-900 text-zinc-100')
+            : (backgroundStyle === 'dark' ? 'bg-zinc-900 hover:bg-zinc-850 text-zinc-400 border-zinc-800' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-650 border-zinc-200')}"
+        aria-label="打開教學"
+        title={lang === 'zh' ? '使用教學' : 'Help / Tutorial'}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </button>
+
       <!-- Toggle Settings Button -->
       <button
         type="button"
@@ -1088,6 +1106,7 @@
       {candidates}
       selectedIndex={selectedCandidateIndex}
       theme={inputBoxStyle === 'crt-terminal' ? 'retro' : (inputBoxStyle === 'minimal-light' ? 'low-profile' : (inputBoxStyle === 'minimal-dark' ? 'minimal-dark' : 'esports'))}
+      {lang}
       onSelect={(c) => replaceCandidateAtCursor(c)}
     />
 
@@ -1143,6 +1162,14 @@
     {lang}
     onSelectEmoji={(emoji) => insertAtCursor(emoji)}
     onClose={() => (isEmojiOpen = false)}
+  />
+
+  <!-- Help Tutorial Modal -->
+  <HelpTutorial
+    isOpen={isHelpOpen}
+    theme={inputBoxStyle === 'crt-terminal' ? 'retro' : (inputBoxStyle === 'minimal-light' ? 'low-profile' : (inputBoxStyle === 'minimal-dark' ? 'minimal-dark' : 'esports'))}
+    {lang}
+    onClose={() => (isHelpOpen = false)}
   />
 
   <!-- Toast Notification Overlay -->

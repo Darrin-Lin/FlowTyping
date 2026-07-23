@@ -11,8 +11,8 @@
   export let layout: "zhuyin" | "english" = "zhuyin";
 
   const t = {
-    zh: { symbols: "符號", emoji: "Emoji" },
-    en: { symbols: "Symbols", emoji: "Emoji" }
+    zh: { symbols: "符號", emoji: "Emoji", select: "選字" },
+    en: { symbols: "Symbols", emoji: "Emoji", select: "Select" }
   };
 
   $: isShiftActive = activeKeys.has('ShiftLeft') || activeKeys.has('ShiftRight');
@@ -391,7 +391,7 @@
             {rgbEnabled && keycapColor === 'sakura-pink' ? 'bg-pink-50 text-pink-700' : ''}
             {rgbEnabled && keycapColor === 'pastel-purple' ? 'bg-purple-50 text-purple-700' : ''}
           ">
-            <span>選字</span>
+            <span>{t[lang].select}</span>
           </div>
         </button>
 
@@ -420,7 +420,10 @@
             {keycapColor === 'sakura-pink' ? (activeKeys.has('Space') ? 'bg-pink-500 text-white' : 'bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 shadow-sm') : ''}
             {keycapColor === 'pastel-purple' ? (activeKeys.has('Space') ? 'bg-purple-600 text-white' : 'bg-purple-50 border border-purple-200 text-purple-600 hover:bg-purple-100 shadow-sm') : ''}
           ">
-            Space
+            <span>Space</span>
+            {#if layout === 'zhuyin'}
+              <span class="text-[10px] opacity-70 ml-1.5 normal-case font-normal">(一)</span>
+            {/if}
           </div>
         </button>
       </div>
